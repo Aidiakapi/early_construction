@@ -1,4 +1,10 @@
 require("util")
+
+local electronic_circuit = "electronic-circuit"
+if data.raw.item["basic-circuit-board"] ~= nil then
+    electronic_circuit = "basic-circuit-board"
+end
+
 data:extend(
     {
         -- Equipment
@@ -400,7 +406,7 @@ data:extend(
                 {"light-armor", 1},
                 {"iron-plate", 10},
                 {"iron-gear-wheel", 5},
-                {"electronic-circuit", 40}
+                {electronic_circuit, 40}
             },
             result = "early-construction-light-armor"
         },
@@ -422,7 +428,7 @@ data:extend(
             enabled = false,
             name = "early-construction-equipment",
             energy_required = 1,
-            ingredients = {{"electronic-circuit", 10}},
+            ingredients = {{electronic_circuit, 10}},
             result = "early-construction-equipment"
         },
         {

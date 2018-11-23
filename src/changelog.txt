@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.2.0
+Date: 19. 11. 2018
+  Features:
+    - Add compatibility with Bob's Electronics (require basic circuit board for the first tier).
+---------------------------------------------------------------------------------------------------
 Version: 0.1.0
 Date: 19. 11. 2018
   Features:
