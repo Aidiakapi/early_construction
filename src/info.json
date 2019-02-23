@@ -1,14 +1,14 @@
 {
     "name": "early_construction",
-    "version": "0.2.0",
+    "version": "0.3.0",
     "title": "Early Construction",
     "author": "Aidiakapi",
     "contact": "aidiakapi@gmail.com",
     "homepage": "",
     "description": "Adds early game construction robots to greatly improve the quality of life of base building. Uses the standard Factorio portable roboport mechanics. Inspired by Nanobots.",
-    "factorio_version": "0.16",
+    "factorio_version": "0.17",
     "dependencies": [
-        "base >= 0.16.0",
+        "base >= 0.17.0",
         "?bobelectronics >= 0.16"
     ]
 }

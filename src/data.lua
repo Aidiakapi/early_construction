@@ -18,7 +18,7 @@ data:extend(
             icon = "__early_construction__/graphics/early-construction-equipment.png",
             icon_size = 32,
             placed_as_equipment_result = "early-construction-equipment",
-            flags = {"goes-to-main-inventory"},
+            flags = {},
             subgroup = "equipment",
             order = "e[robotics]-a[early-construction-equipment]",
             stack_size = 5
@@ -29,8 +29,8 @@ data:extend(
             take_result = "early-construction-equipment",
             sprite = {
                 filename = "__early_construction__/graphics/early-construction-equipment.png",
-                width = 64,
-                height = 64,
+                width = 32,
+                height = 32,
                 priority = "medium"
             },
             shape = {
@@ -86,7 +86,7 @@ data:extend(
             name = "early-construction-light-armor",
             icon = "__early_construction__/graphics/light-armor.png",
             icon_size = 32,
-            flags = {"goes-to-main-inventory"},
+            flags = {},
             resistances = {
                 {
                     type = "physical",
@@ -96,7 +96,7 @@ data:extend(
                 {
                     type = "acid",
                     decrease = 0,
-                    percent = 10
+                    percent = 20
                 },
                 {
                     type = "explosion",
@@ -109,18 +109,18 @@ data:extend(
                     percent = 10
                 }
             },
-            durability = 1000,
             subgroup = "armor",
             equipment_grid = "small-early-construction-equipment-grid",
             order = "a[light-armozr][early-construction]",
-            stack_size = 1
+            stack_size = 1,
+            infinite = true
         },
         {
             type = "armor",
             name = "early-construction-heavy-armor",
             icon = "__early_construction__/graphics/heavy-armor.png",
             icon_size = 32,
-            flags = {"goes-to-main-inventory"},
+            flags = {},
             resistances = {
                 {
                     type = "physical",
@@ -134,8 +134,8 @@ data:extend(
                 },
                 {
                     type = "acid",
-                    decrease = 3,
-                    percent = 30
+                    decrease = 0,
+                    percent = 40
                 },
                 {
                     type = "fire",
@@ -143,11 +143,11 @@ data:extend(
                     percent = 30
                 }
             },
-            durability = 5000,
             subgroup = "armor",
             equipment_grid = "medium-early-construction-equipment-grid",
             order = "b[heavy-armozr][early-construction]",
-            stack_size = 1
+            stack_size = 1,
+            infinite = true
         },
         -- Robot
         {
@@ -155,7 +155,7 @@ data:extend(
             name = "early-construction-robot",
             icon = "__early_construction__/graphics/early-construction-robot.png",
             icon_size = 32,
-            flags = {"goes-to-main-inventory"},
+            flags = {},
             subgroup = "logistic-network",
             order = "a[robot]-b[early-construction-robot]",
             place_result = "early-construction-robot",
@@ -465,7 +465,7 @@ data:extend(
             },
             unit = {
                 count = 25,
-                ingredients = {{"science-pack-1", 1}},
+                ingredients = {{"automation-science-pack", 1}},
                 time = 5
             },
             order = "a-c-a"
@@ -485,8 +485,8 @@ data:extend(
             unit = {
                 count = 200,
                 ingredients = {
-                    {"science-pack-1", 1},
-                    {"science-pack-2", 1}
+                    {"automation-science-pack", 1},
+                    {"logistic-science-pack", 1}
                 },
                 time = 30
             },
