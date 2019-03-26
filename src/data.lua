@@ -182,7 +182,7 @@ data:extend(
             min_to_charge = 0.1,
             max_to_charge = 0.2,
             working_light = {intensity = 0.8, size = 3, color = {r = 0.8, g = 0.8, b = 0.8}},
-            dying_explosion = "explosion-hit",
+            dying_explosion = "explosion",
             idle = {
                 filename = "__early_construction__/graphics/early-construction-robot/construction-robot.png",
                 priority = "high",

@@ -3,22 +3,20 @@ local -- Forward declare functions
       on_robot_pre_mined,
       on_built_entity,
       on_tick,
+      on_tick_tracked_robots,
+      on_tick_pending_destruction,
+      update_tick_handler,
       track_robot,
       untrack_robot,
-      global_force,
+      queue_robot_destruction,
       get_associated_player,
+      global_force,
       warn_force_of_incorrect_usage
-
 
 on_robot_built = function (event)
     local robot = event.robot
     if robot.name ~= 'early-construction-robot' then return end
-    local player = get_associated_player(robot)
-    if player then
-        robot.die(robot.force, player)
-    else
-        robot.die(robot.force)
-    end
+    queue_robot_destruction(robot)
 end
 
 on_robot_pre_mined = function (event)
@@ -27,7 +25,7 @@ on_robot_pre_mined = function (event)
     local player = get_associated_player(robot)
     if not player then
         warn_force_of_incorrect_usage(robot.force, event.tick)
-        robot.die(robot.force)
+        queue_robot_destruction(robot)
         return
     end
 
@@ -45,20 +43,45 @@ on_built_entity = function (event)
     player.insert({ name = 'early-construction-robot', count = 1 })
 end
 
-on_tick = function (event)
+on_tick = function ()
+    if global.tracked_robots_count > 0 then
+        on_tick_tracked_robots()
+    end
+    if #global.robots_pending_destruction > 0 then
+        on_tick_pending_destruction()
+    end
+end
+
+on_tick_tracked_robots = function ()
     for unit_number, entry in pairs(global.tracked_robots) do
         if not entry.player.valid or not entry.robot.valid then
+            queue_robot_destruction(entry.robot)
             untrack_robot(unit_number)
-            if entry.robot.valid then
-                entry.robot.die(entry.robot.force)
-            end
         else
             if entry.cargo_inventory.is_empty() then
+                queue_robot_destruction(entry.robot)
                 untrack_robot(unit_number)
-                entry.robot.die(entry.player.force, entry.player)
             end
         end
     end
+end
+
+on_tick_pending_destruction = function ()
+    for _, robot in ipairs(global.robots_pending_destruction) do
+        if robot.valid then
+            robot.surface.create_entity({
+                name = 'explosion-hit',
+                position = robot.position,
+                force = robot.force,
+            })
+            robot.destroy({
+                do_cliff_correction = false,
+                raise_destroy = true,
+            })
+        end
+    end
+    global.robots_pending_destruction = {}
+    update_tick_handler()
 end
 
 script.on_event(defines.events.on_robot_built_entity, on_robot_built)
@@ -70,16 +93,52 @@ script.on_event(defines.events.on_built_entity, on_built_entity)
 
 script.on_init(function ()
     global.tracked_robots = {}
+    global.tracked_robots_count = 0
+    global.robots_pending_destruction = {}
     global.forces = {}
     for _, force in pairs(game.forces) do
         global.forces[force.name] = {}
     end
 end)
 script.on_load(function ()
-    if global.ticking then
+    if global.is_ticking then
         script.on_event(defines.events.on_tick, on_tick)
     end
 end)
+
+script.on_configuration_changed(function ()
+    --[[
+        Migration from 0.3 to 0.4
+    --]]
+    
+    -- Renamed global.tracked_robot_count to global.tracked_robots_count
+    if global.tracked_robot_count then
+        global.tracked_robot_count = nil
+    end
+
+    -- Previously, this variable wasn't initialized upon init, and was instead nil-checked
+    -- now it is initialized. This variable can be safely derived from global.tracked_robots.
+    if global.tracked_robots_count == nil then
+        local count = 0
+        for _ in pairs(global.tracked_robots) do
+            count = count + 1
+        end
+        global.tracked_robots_count = count
+    end
+
+    -- Renamed global.ticking to global.is_ticking
+    -- update_tick_handler invoked later will take care of initializing the global variable,
+    -- and setting up the event handler if necessary.
+    global.ticking = nil
+
+    -- Newly introduced variables
+    if global.robots_pending_destruction == nil then
+        global.robots_pending_destruction = {}
+    end
+
+    update_tick_handler()
+end)
+
 script.on_event(defines.events.on_force_created, function (event)
     global.forces[event.force.name] = {}
 end)
@@ -87,31 +146,48 @@ script.on_event(defines.events.on_forces_merged, function (event)
     global.forces[event.source_name] = nil
 end)
 
-track_robot = function (robot, player, cargo_inventory)
-    if not global.ticking then
-        global.ticking = true
-        script.on_event(defines.events.on_tick, on_tick)
+update_tick_handler = function ()
+    local should_be_ticking = false
+    if global.tracked_robots_count > 0 then
+        should_be_ticking = true
     end
-    global.tracked_robot_count = ((global.tracked_robot_count or 0) + 1)
+    if #global.robots_pending_destruction > 0 then
+        should_be_ticking = true
+    end
+
+    global.is_ticking = should_be_ticking
+    if should_be_ticking then
+        script.on_event(defines.events.on_tick, on_tick)
+    else
+        script.on_event(defines.events.on_tick, nil)
+    end
+end
+
+track_robot = function (robot, player, cargo_inventory)
+    if global.tracked_robots[robot.unit_number] then
+        untrack_robot(robot.unit_number)
+    end
+    global.tracked_robots_count = global.tracked_robots_count + 1
     global.tracked_robots[robot.unit_number] = {
         robot = robot,
         player = player,
         cargo_inventory = cargo_inventory,
     }
+    update_tick_handler()
 end
 
 untrack_robot = function (unit_number)
-    local tracked_robot_count = global.tracked_robot_count
-    global.tracked_robot_count = tracked_robot_count - 1
-    if tracked_robot_count == 1 then
-        global.ticking = false
-        script.on_event(defines.events.on_tick, nil)
-    end
+    if global.tracked_robots[unit_number] == nil then return end
+    global.tracked_robots_count = global.tracked_robots_count - 1
     global.tracked_robots[unit_number] = nil
+    update_tick_handler()
 end
 
-global_force = function (force)
-    return global.forces[force.name]
+queue_robot_destruction = function (robot)
+    if not robot.valid then return end
+    
+    table.insert(global.robots_pending_destruction, robot)
+    update_tick_handler()
 end
 
 get_associated_player = function (robot)
@@ -125,6 +201,10 @@ get_associated_player = function (robot)
             end
         end
     end
+end
+
+global_force = function (force)
+    return global.forces[force.name]
 end
 
 warn_force_of_incorrect_usage = function (force, tick)

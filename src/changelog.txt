@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.0
+Date: 26. 03. 2018
+  Changes:
+    - Robots are no longer killed, but instead destroyed. (They'll no longer show up under kills.)
+    - Destruction of robots is delayed by one frame to workaround a bug in Factorio that causes incompatibilities between mods.
+---------------------------------------------------------------------------------------------------
 Version: 0.3.0
 Date: 23. 02. 2018
   Features:
