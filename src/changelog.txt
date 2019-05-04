@@ -1,12 +1,17 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.4.1
+Date: 04. 05. 2019
+  Bugfixes:
+    - Fixed bug caused by mod API changes in 0.17.35. Thanks Vandhal for reporting!
+---------------------------------------------------------------------------------------------------
 Version: 0.4.0
-Date: 26. 03. 2018
+Date: 26. 03. 2019
   Changes:
     - Robots are no longer killed, but instead destroyed. (They'll no longer show up under kills.)
     - Destruction of robots is delayed by one frame to workaround a bug in Factorio that causes incompatibilities between mods.
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.0
-Date: 23. 02. 2018
+Date: 23. 02. 2019
   Features:
     - Update to Factorio 0.17.
 ---------------------------------------------------------------------------------------------------
@@ -19,3 +24,4 @@ Version: 0.1.0
 Date: 19. 11. 2018
   Features:
     - Add early game robots.
+    

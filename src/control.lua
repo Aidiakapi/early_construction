@@ -196,7 +196,7 @@ get_associated_player = function (robot)
         local logistic_cell = logistic_network.cells[1]
         if logistic_cell then
             local owner = logistic_cell.owner
-            if owner and owner.type == 'player' then
+            if owner and owner.type == 'character' then
                 return owner
             end
         end
