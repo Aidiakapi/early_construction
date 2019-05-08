@@ -11,7 +11,9 @@ local -- Forward declare functions
       queue_robot_destruction,
       get_associated_player,
       global_force,
-      warn_force_of_incorrect_usage
+      warn_force_of_incorrect_usage,
+      on_configuration_changed_migrate_0_3_to_0_4,
+      on_configuration_changed_handle_startup_setting_changes
 
 on_robot_built = function (event)
     local robot = event.robot
@@ -106,37 +108,12 @@ script.on_load(function ()
     end
 end)
 
-script.on_configuration_changed(function ()
-    --[[
-        Migration from 0.3 to 0.4
-    --]]
-    
-    -- Renamed global.tracked_robot_count to global.tracked_robots_count
-    if global.tracked_robot_count then
-        global.tracked_robot_count = nil
+script.on_configuration_changed(function (changes)
+    on_configuration_changed_migrate_0_3_to_0_4()
+
+    if changes.mod_startup_settings_changed then
+        on_configuration_changed_handle_startup_setting_changes()
     end
-
-    -- Previously, this variable wasn't initialized upon init, and was instead nil-checked
-    -- now it is initialized. This variable can be safely derived from global.tracked_robots.
-    if global.tracked_robots_count == nil then
-        local count = 0
-        for _ in pairs(global.tracked_robots) do
-            count = count + 1
-        end
-        global.tracked_robots_count = count
-    end
-
-    -- Renamed global.ticking to global.is_ticking
-    -- update_tick_handler invoked later will take care of initializing the global variable,
-    -- and setting up the event handler if necessary.
-    global.ticking = nil
-
-    -- Newly introduced variables
-    if global.robots_pending_destruction == nil then
-        global.robots_pending_destruction = {}
-    end
-
-    update_tick_handler()
 end)
 
 script.on_event(defines.events.on_force_created, function (event)
@@ -213,5 +190,47 @@ warn_force_of_incorrect_usage = function (force, tick)
     if previous_warn_tick == nil or previous_warn_tick + 3600 <= tick then
         force.print('Early construction robots must only be used with personal roboport equipment.', {r=1, g=0, b=0, a=1})
         global.previous_warn_tick = tick
+    end
+end
+
+on_configuration_changed_migrate_0_3_to_0_4 = function ()
+    --[[
+        Migration from 0.3 to 0.4
+    --]]
+    
+    -- Renamed global.tracked_robot_count to global.tracked_robots_count
+    if global.tracked_robot_count then
+        global.tracked_robot_count = nil
+    end
+
+    -- Previously, this variable wasn't initialized upon init, and was instead nil-checked
+    -- now it is initialized. This variable can be safely derived from global.tracked_robots.
+    if global.tracked_robots_count == nil then
+        local count = 0
+        for _ in pairs(global.tracked_robots) do
+            count = count + 1
+        end
+        global.tracked_robots_count = count
+    end
+
+    -- Renamed global.ticking to global.is_ticking
+    -- update_tick_handler invoked later will take care of initializing the global variable,
+    -- and setting up the event handler if necessary.
+    global.ticking = nil
+
+    -- Newly introduced variables
+    if global.robots_pending_destruction == nil then
+        global.robots_pending_destruction = {}
+    end
+
+    update_tick_handler()
+end
+
+on_configuration_changed_handle_startup_setting_changes = function ()
+    for _, force in pairs(game.forces) do
+        if force.technologies['early-construction-light-armor'].researched then
+            log(('[early_construction] resetting technology effects for force %q'):format(force.name))
+            force.reset_technology_effects()
+        end
     end
 end

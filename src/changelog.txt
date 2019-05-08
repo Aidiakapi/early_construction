@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.0
+Date: 08. 05. 2019
+  Features:
+    - Destroyed entities will now leave behind a ghost after the first research (can be disabled in settings). Thanks Vandhal for the suggestion!
+---------------------------------------------------------------------------------------------------
 Version: 0.4.1
 Date: 04. 05. 2019
   Bugfixes:
@@ -8,7 +13,7 @@ Version: 0.4.0
 Date: 26. 03. 2019
   Changes:
     - Robots are no longer killed, but instead destroyed. (They'll no longer show up under kills.)
-    - Destruction of robots is delayed by one frame to workaround a bug in Factorio that causes incompatibilities between mods.
+    - Destruction of robots is delayed by one frame to workaround a bug in Factorio that causes incompatibilities between mods. Thanks muppet9010 for reporting!
 ---------------------------------------------------------------------------------------------------
 Version: 0.3.0
 Date: 23. 02. 2019

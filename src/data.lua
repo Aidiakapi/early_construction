@@ -5,6 +5,28 @@ if data.raw.item["basic-circuit-board"] ~= nil then
     electronic_circuit = "basic-circuit-board"
 end
 
+local function combine_effects(...)
+    local n = select('#', ...)
+    local effects = {}
+    for i = 1, n do
+        local current = select(i, ...)
+        if type(current) == 'table' then
+            for _, v in pairs(current) do
+                effects[#effects + 1] = v
+            end
+        end
+    end
+    return effects
+end
+
+local ghosts_when_destroyed_effects
+if settings.startup['early-construction-enable-entity-ghosts-when-destroyed'].value then
+    ghosts_when_destroyed_effects = { {
+        type = "ghost-time-to-live",
+        modifier = 60 * 60 * 60 * 24 * 7
+    } }
+end
+
 data:extend(
     {
         -- Equipment
@@ -437,8 +459,8 @@ data:extend(
             enabled = false,
             energy_required = 3,
             ingredients = {
-                {"repair-pack", 1},
-                {"coal", 2}
+                {"repair-pack", 1 },
+                {"coal", 2 }
             },
             result = "early-construction-robot",
             result_count = 6
@@ -449,7 +471,7 @@ data:extend(
             name = "early-construction-light-armor",
             icon_size = 128,
             icon = "__early_construction__/graphics/technology.png",
-            effects = {
+            effects = combine_effects({
                 {
                     type = "unlock-recipe",
                     recipe = "early-construction-robot"
@@ -461,8 +483,8 @@ data:extend(
                 {
                     type = "unlock-recipe",
                     recipe = "early-construction-equipment"
-                }
-            },
+                },
+            }, ghosts_when_destroyed_effects),
             unit = {
                 count = 25,
                 ingredients = {{"automation-science-pack", 1}},
