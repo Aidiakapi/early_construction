@@ -111,7 +111,7 @@ end)
 script.on_configuration_changed(function (changes)
     on_configuration_changed_migrate_0_3_to_0_4()
 
-    if changes.mod_startup_settings_changed then
+    if changes.mod_startup_settings_changed or changes.mod_changes['early_construction'] then
         on_configuration_changed_handle_startup_setting_changes()
     end
 end)
