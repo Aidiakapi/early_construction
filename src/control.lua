@@ -71,15 +71,29 @@ end
 on_tick_pending_destruction = function ()
     for _, robot in ipairs(global.robots_pending_destruction) do
         if robot.valid then
-            robot.surface.create_entity({
-                name = 'explosion-hit',
-                position = robot.position,
-                force = robot.force,
-            })
-            robot.destroy({
-                do_cliff_correction = false,
-                raise_destroy = true,
-            })
+            local inventory = robot.get_inventory(defines.inventory.robot_cargo)
+            local should_destroy = true
+            if inventory and not inventory.is_empty() then
+                local player = get_associated_player(robot)
+                if not player then
+                    warn_force_of_incorrect_usage(robot.force, event.tick)
+                else
+                    track_robot(robot, player, inventory)
+                    should_destroy = false
+                end
+            end
+
+            if should_destroy then
+                robot.surface.create_entity({
+                    name = 'explosion-hit',
+                    position = robot.position,
+                    force = robot.force,
+                })
+                robot.destroy({
+                    do_cliff_correction = false,
+                    raise_destroy = true,
+                })
+            end
         end
     end
     global.robots_pending_destruction = {}
