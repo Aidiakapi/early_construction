@@ -45,12 +45,12 @@ on_built_entity = function (event)
     player.insert({ name = 'early-construction-robot', count = 1 })
 end
 
-on_tick = function ()
+on_tick = function (event)
     if global.tracked_robots_count > 0 then
         on_tick_tracked_robots()
     end
     if #global.robots_pending_destruction > 0 then
-        on_tick_pending_destruction()
+        on_tick_pending_destruction(event)
     end
 end
 
@@ -68,7 +68,7 @@ on_tick_tracked_robots = function ()
     end
 end
 
-on_tick_pending_destruction = function ()
+on_tick_pending_destruction = function (event)
     for _, robot in ipairs(global.robots_pending_destruction) do
         if robot.valid then
             local inventory = robot.get_inventory(defines.inventory.robot_cargo)
