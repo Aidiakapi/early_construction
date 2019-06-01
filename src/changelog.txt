@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.3
+Date: 01. 06. 2019
+  Bugfixes:
+    - Fixed that you could sometimes lose some repair packs when a single robot both repaired and built/destroyed an entity. Thanks Nirahiel for reporting!
+---------------------------------------------------------------------------------------------------
 Version: 0.5.2
 Date: 13. 05. 2019
   Bugfixes:

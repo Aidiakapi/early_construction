@@ -56,14 +56,12 @@ end
 
 on_tick_tracked_robots = function ()
     for unit_number, entry in pairs(global.tracked_robots) do
-        if not entry.player.valid or not entry.robot.valid then
+        if not entry.player.valid or
+           not entry.robot.valid or
+           not entry.cargo_inventory.valid or
+           entry.cargo_inventory.is_empty() then
             queue_robot_destruction(entry.robot)
             untrack_robot(unit_number)
-        else
-            if entry.cargo_inventory.is_empty() then
-                queue_robot_destruction(entry.robot)
-                untrack_robot(unit_number)
-            end
         end
     end
 end
@@ -73,17 +71,30 @@ on_tick_pending_destruction = function (event)
         if robot.valid then
             local inventory = robot.get_inventory(defines.inventory.robot_cargo)
             local should_destroy = true
-            if inventory and not inventory.is_empty() then
-                local player = get_associated_player(robot)
-                if not player then
-                    warn_force_of_incorrect_usage(robot.force, event.tick)
-                else
-                    track_robot(robot, player, inventory)
-                    should_destroy = false
-                end
+
+            local player = get_associated_player(robot)
+            if not player then
+                warn_force_of_incorrect_usage(robot.force, event.tick)
+            elseif inventory and not inventory.is_empty() then
+                track_robot(robot, player, inventory)
+                should_destroy = false
             end
 
             if should_destroy then
+                -- When robots both repair and destroy/build an item, they'd normally
+                -- lose the repair packs. This moves those repair packs back into the
+                -- players' inventory.
+                local player_inventory = player.get_main_inventory()
+                local repair_inventory = robot.get_inventory(defines.inventory.robot_repair)
+                if repair_inventory and not repair_inventory.is_empty() then
+                    for i = 1, #repair_inventory do
+                        local item_stack = repair_inventory[i]
+                        if item_stack.valid_for_read then
+                            player_inventory.insert(item_stack)
+                        end
+                    end
+                end
+
                 robot.surface.create_entity({
                     name = 'explosion-hit',
                     position = robot.position,
