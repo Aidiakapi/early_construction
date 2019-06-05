@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.5.4
+Date: 05. 06. 2019
+  Bugfixes:
+    - Fixed that non-minable entity marked for deconstruction could result in an infinite stream of robots self-destructing. Thanks Nirahiel for reporting!
+---------------------------------------------------------------------------------------------------
 Version: 0.5.3
 Date: 01. 06. 2019
   Bugfixes:

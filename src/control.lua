@@ -1,6 +1,6 @@
 local -- Forward declare functions
       on_robot_built,
-      on_robot_pre_mined,
+      on_robot_mined,
       on_built_entity,
       on_tick,
       on_tick_tracked_robots,
@@ -21,7 +21,7 @@ on_robot_built = function (event)
     queue_robot_destruction(robot)
 end
 
-on_robot_pre_mined = function (event)
+on_robot_mined = function (event)
     local robot = event.robot
     if robot.name ~= 'early-construction-robot' then return end
     local player = get_associated_player(robot)
@@ -114,7 +114,7 @@ end
 script.on_event(defines.events.on_robot_built_entity, on_robot_built)
 script.on_event(defines.events.on_robot_built_tile, on_robot_built)
 
-script.on_event(defines.events.on_robot_pre_mined, on_robot_pre_mined)
+script.on_event(defines.events.on_robot_mined, on_robot_mined)
 
 script.on_event(defines.events.on_built_entity, on_built_entity)
 
