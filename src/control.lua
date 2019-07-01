@@ -84,13 +84,15 @@ on_tick_pending_destruction = function (event)
                 -- When robots both repair and destroy/build an item, they'd normally
                 -- lose the repair packs. This moves those repair packs back into the
                 -- players' inventory.
-                local player_inventory = player.get_main_inventory()
-                local repair_inventory = robot.get_inventory(defines.inventory.robot_repair)
-                if repair_inventory and not repair_inventory.is_empty() then
-                    for i = 1, #repair_inventory do
-                        local item_stack = repair_inventory[i]
-                        if item_stack.valid_for_read then
-                            player_inventory.insert(item_stack)
+                if player then
+                    local player_inventory = player.get_main_inventory()
+                    local repair_inventory = robot.get_inventory(defines.inventory.robot_repair)
+                    if repair_inventory and not repair_inventory.is_empty() then
+                        for i = 1, #repair_inventory do
+                            local item_stack = repair_inventory[i]
+                            if item_stack.valid_for_read then
+                                player_inventory.insert(item_stack)
+                            end
                         end
                     end
                 end
@@ -187,7 +189,7 @@ end
 
 queue_robot_destruction = function (robot)
     if not robot.valid then return end
-    
+
     table.insert(global.robots_pending_destruction, robot)
     update_tick_handler()
 end
@@ -222,7 +224,7 @@ on_configuration_changed_migrate_0_3_to_0_4 = function ()
     --[[
         Migration from 0.3 to 0.4
     --]]
-    
+
     -- Renamed global.tracked_robot_count to global.tracked_robots_count
     if global.tracked_robot_count then
         global.tracked_robot_count = nil
