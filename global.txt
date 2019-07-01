@@ -1,0 +1,32 @@
+Document describes the layout of the global table.
+
+v0.6:
+
+version == 1
+
+global :: {
+    version :: "Global table version, for easier migration code" int,
+    is_ticking :: bool,
+    tracked_robots[unit_number :: int] :: "Dictionary of all the robots that have placed or destroyed an entity, and should therefore be consumed" {
+        robot :: LuaEntity (type == 'construction-robot'),
+        no_destruction_before_tick :: "prevents destruction of robot in the same tick that a related event fires, for mod compatibility" int
+        cargo_inventory :: LuaInventory
+        repair_inventory :: LuaInventory
+    }
+}
+
+Before v0.6:
+
+global :: {
+    forces[force_name :: string] :: {
+        previous_warn_tick :: int,
+    },
+    tracked_robots_count :: int,
+    tracked_robots[unit_number :: int] :: {
+        robot :: LuaEntity (type == 'construction-robot'),
+        player :: LuaPlayer,
+        cargo_inventory :: LuaInventory
+    },
+    robots_pending_destruction[] :: LuaEnity (type == 'construction-robot'),
+    is_ticking :: bool,
+}

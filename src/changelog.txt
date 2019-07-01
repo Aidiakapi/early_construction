@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.6.0
+Date: 01. 07. 2019
+  Changes:
+    - Early construction robots can now be deployed via non-personal roboports.
+    - Reimplemented the destruction logic to maximize mod compatibility, and simplified the code a lot.
+---------------------------------------------------------------------------------------------------
 Version: 0.5.5
 Date: 17. 06. 2019
   Bugfixes:
