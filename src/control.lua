@@ -2,10 +2,12 @@ local -- Forward declare functions
       on_robot_built,
       on_robot_mined,
       on_built_entity,
+      on_player_mined_entity,
       on_tick,
-      update_tick_handler,
       track_robot,
       untrack_robot,
+      create_robot_death_effect,
+      update_tick_handler,
       on_init,
       on_load,
       on_configuration_changed,
@@ -35,6 +37,15 @@ on_built_entity = function (event)
     player.insert({ name = 'early-construction-robot', count = 1 })
 end
 
+on_player_mined_entity = function (event)
+    if not event.entity or not event.entity.valid or event.entity.name ~= 'early-construction-robot' then return end
+    if global.tracked_robots[event.entity.unit_number] ~= nil then
+        event.buffer.remove({ name = 'early-construction-robot', count = 1 })
+        create_robot_death_effect(event.entity)
+        untrack_robot(event.entity.unit_number)
+    end
+end
+
 on_tick = function (event)
     for unit_number, entry in pairs(global.tracked_robots) do
         if not entry.robot.valid then
@@ -46,11 +57,7 @@ on_tick = function (event)
 
             if not holds_items then
                 untrack_robot(unit_number)
-                entry.robot.surface.create_entity({
-                    name = 'explosion-hit',
-                    position = entry.robot.position,
-                    force = entry.robot.force,
-                })
+                create_robot_death_effect(entry.robot)
                 entry.robot.destroy({
                     do_cliff_correction = false,
                     raise_destroy = true,
@@ -78,6 +85,14 @@ untrack_robot = function (unit_number)
     if global.tracked_robots[unit_number] == nil then return end
     global.tracked_robots[unit_number] = nil
     update_tick_handler()
+end
+
+create_robot_death_effect = function (robot)
+    robot.surface.create_entity({
+        name = 'explosion-hit',
+        position = robot.position,
+        force = robot.force,
+    })
 end
 
 update_tick_handler = function ()
@@ -183,6 +198,7 @@ script.on_event(defines.events.on_robot_built_entity, on_robot_built)
 script.on_event(defines.events.on_robot_built_tile, on_robot_built)
 script.on_event(defines.events.on_robot_mined, on_robot_mined)
 script.on_event(defines.events.on_built_entity, on_built_entity)
+script.on_event(defines.events.on_player_mined_entity, on_player_mined_entity)
 
 script.on_init(on_init)
 script.on_load(on_load)

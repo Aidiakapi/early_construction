@@ -189,7 +189,7 @@ data:extend(
             icon = "__early_construction__/graphics/early-construction-robot.png",
             icon_size = 32,
             flags = {"placeable-player", "player-creation", "placeable-off-grid", "not-on-map"},
-            -- minable = {hardness = 0.1, mining_time = 0.1, result = "construction-robot"},
+            minable = {hardness = 0.1, mining_time = 0.1, result = "early-construction-robot"},
             resistances = {{type = "fire", percent = 85}},
             max_health = 100,
             collision_box = {{0, 0}, {0, 0}},

@@ -4,6 +4,7 @@ Date: 01. 07. 2019
   Changes:
     - Early construction robots can now be deployed via non-personal roboports.
     - Reimplemented the destruction logic to maximize mod compatibility, and simplified the code a lot.
+    - Early construction robots can now be mined by hand. It will return the robot to your inventory if it didn't place or mine anything.
 ---------------------------------------------------------------------------------------------------
 Version: 0.5.5
 Date: 17. 06. 2019
