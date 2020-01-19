@@ -1,10 +1,5 @@
 require("util")
 
-local electronic_circuit = "electronic-circuit"
-if data.raw.item["basic-circuit-board"] ~= nil then
-    electronic_circuit = "basic-circuit-board"
-end
-
 local function combine_effects(...)
     local n = select("#", ...)
     local effects = {}
@@ -25,6 +20,69 @@ if settings.startup["early-construction-enable-entity-ghosts-when-destroyed"].va
         type = "ghost-time-to-live",
         modifier = 60 * 60 * 60 * 24 * 7
     } }
+end
+
+local light_armor_ingredients = {
+    {"light-armor", 1},
+    {"iron-plate", 10},
+    {"iron-gear-wheel", 5},
+    {"electronic-circuit", 40}
+}
+local heavy_armor_ingredients = {
+    {"early-construction-light-armor", 1},
+    {"heavy-armor", 1},
+    {"electronic-circuit", 200},
+    {"steel-plate", 20}
+}
+local equipment_ingredients = {
+    {"electronic-circuit", 10}
+}
+local robot_ingredients = {
+    {"repair-pack", 1 },
+    {"coal", 2 }
+}
+
+local function patch_strings(from, to, table)
+    for k, v in pairs(table) do
+        if v == from then
+            table[k] = to
+        elseif type(v) == "table" then
+            patch_strings(from, to, v)
+        end
+    end
+end
+--[[
+    Bob's Electronics compatibility patch
+]]
+if data.raw.item["basic-circuit-board"] ~= nil then
+    patch_strings("electronic-circuit", "basic-circuit-board", light_armor_ingredients)
+    patch_strings("electronic-circuit", "basic-circuit-board", equipment_ingredients)
+end
+
+--[[
+    Industrial Revolution compatibility patch
+]]
+if data.raw.technology["deadlock-bronze-age"] ~= nil then
+    light_armor_ingredients = {
+        {"light-armor", 1},
+        {"copper-plate", 10},
+        {"tin-gear-wheel", 5},
+        {"copper-motor", 10}
+    }
+    heavy_armor_ingredients = {
+        {"early-construction-light-armor", 1},
+        {"heavy-armor", 1},
+        {"copper-motor", 50},
+        {"bronze-chassis-small", 1}
+    }
+    equipment_ingredients = {
+        {"copper-motor", 5}
+    }
+    robot_ingredients = {
+        {"tin-plate", 1},
+        {"copper-gear-wheel", 1},
+        {"coal", 2}
+    }
 end
 
 data:extend(
@@ -424,12 +482,7 @@ data:extend(
             name = "early-construction-light-armor",
             enabled = false,
             energy_required = 3,
-            ingredients = {
-                {"light-armor", 1},
-                {"iron-plate", 10},
-                {"iron-gear-wheel", 5},
-                {electronic_circuit, 40}
-            },
+            ingredients = light_armor_ingredients,
             result = "early-construction-light-armor"
         },
         {
@@ -437,12 +490,7 @@ data:extend(
             name = "early-construction-heavy-armor",
             enabled = false,
             energy_required = 8,
-            ingredients = {
-                {"early-construction-light-armor", 1},
-                {"heavy-armor", 1},
-                {"electronic-circuit", 200},
-                {"steel-plate", 20}
-            },
+            ingredients = heavy_armor_ingredients,
             result = "early-construction-heavy-armor"
         },
         {
@@ -450,7 +498,7 @@ data:extend(
             enabled = false,
             name = "early-construction-equipment",
             energy_required = 1,
-            ingredients = {{electronic_circuit, 10}},
+            ingredients = equipment_ingredients,
             result = "early-construction-equipment"
         },
         {
@@ -458,10 +506,7 @@ data:extend(
             name = "early-construction-robot",
             enabled = false,
             energy_required = 3,
-            ingredients = {
-                {"repair-pack", 1 },
-                {"coal", 2 }
-            },
+            ingredients = robot_ingredients,
             result = "early-construction-robot",
             result_count = 6
         },
@@ -503,7 +548,7 @@ data:extend(
                     recipe = "early-construction-heavy-armor"
                 }
             },
-            prerequisites = {"heavy-armor", "early-construction-light-armor"},
+            prerequisites = {"heavy-armor", "early-construction-light-armor", "logistic-science-pack"},
             unit = {
                 count = 200,
                 ingredients = {

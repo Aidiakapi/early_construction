@@ -121,7 +121,7 @@ on_configuration_changed = function (changes)
     if global.version == nil then
         on_configuration_changed_migrate_0_3_to_0_4()
         on_configuration_changed_migrate_0_5_to_0_6()
-        game.print('[Early Construction] Migrated to version 0.6.')
+        game.print('[Early Construction] Migrated to version 0.7.')
     end
 
     if changes.mod_startup_settings_changed or changes.mod_changes['early_construction'] then
