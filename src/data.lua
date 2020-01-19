@@ -6,11 +6,11 @@ if data.raw.item["basic-circuit-board"] ~= nil then
 end
 
 local function combine_effects(...)
-    local n = select('#', ...)
+    local n = select("#", ...)
     local effects = {}
     for i = 1, n do
         local current = select(i, ...)
-        if type(current) == 'table' then
+        if type(current) == "table" then
             for _, v in pairs(current) do
                 effects[#effects + 1] = v
             end
@@ -20,7 +20,7 @@ local function combine_effects(...)
 end
 
 local ghosts_when_destroyed_effects
-if settings.startup['early-construction-enable-entity-ghosts-when-destroyed'].value then
+if settings.startup["early-construction-enable-entity-ghosts-when-destroyed"].value then
     ghosts_when_destroyed_effects = { {
         type = "ghost-time-to-live",
         modifier = 60 * 60 * 60 * 24 * 7
