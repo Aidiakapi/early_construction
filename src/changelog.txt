@@ -1,5 +1,10 @@
 ---------------------------------------------------------------------------------------------------
-Version: 0.1.0
+Version: 0.8.0
+Date: 19. 01. 2020
+  Features:
+    - Update to Factorio 0.18.
+---------------------------------------------------------------------------------------------------
+Version: 0.7.0
 Date: 19. 01. 2020
   Features:
     - Add compatibility with Industrial Revolution (different recipes).

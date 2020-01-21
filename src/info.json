@@ -1,15 +1,15 @@
 {
     "name": "early_construction",
-    "version": "0.7.0",
+    "version": "0.8.0",
     "title": "Early Construction",
     "author": "Aidiakapi",
     "contact": "aidiakapi@gmail.com",
     "homepage": "",
-    "description": "Adds early game construction robots to greatly improve the quality of life of base building. Uses the standard Factorio portable roboport mechanics. Inspired by Nanobots. Compatible with Bob's Electronics and Industrial Revolution.",
-    "factorio_version": "0.17",
+    "description": "Adds early game construction robots to greatly improve the quality of life of base building. Uses the standard Factorio portable roboport mechanics. Inspired by Nanobots. Compatible with Bob's Electronics.",
+    "factorio_version": "0.18",
     "dependencies": [
-        "base >= 0.17.35",
-        "?bobelectronics >= 0.17",
+        "base >= 0.18.0",
+        "?bobelectronics >= 0.18",
         "?IndustrialRevolution >= 1.0"
     ]
 }
