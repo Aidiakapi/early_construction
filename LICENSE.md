@@ -1,3 +1,5 @@
+All code is licensed under:
+
 ISC License
 
 Copyright (c) 2018, Aidiakapi
@@ -13,3 +15,8 @@ INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
 LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE
 OR OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
 PERFORMANCE OF THIS SOFTWARE.
+
+-----
+
+Graphics are modified sprites from the base game, and these modifications are
+covered in the Terms of Service (https://factorio.com/terms-of-service).

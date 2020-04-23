@@ -1,4 +1,11 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.8.1
+Date: 23. 04. 2020
+  Changes:
+    - Re-modify graphics from base game, resulting in the same shadows as the base game, as well as updated visual effects.
+  Bugfixes:
+    - Fixed minor issue with the robot shadow. Thanks millerlarson for reporting!
+---------------------------------------------------------------------------------------------------
 Version: 0.8.0
 Date: 19. 01. 2020
   Features:

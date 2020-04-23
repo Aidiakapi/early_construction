@@ -1,0 +1,4 @@
+The graphics are modified versions of the base game sprites.
+
+Using ImageMagick, run this command in the <Factorio>/data/base/graphics/entity/construction-robot/ directory:
+magick mogrify -modulate 95,130,90 -path "<repo>/src/graphics/early-construction-robot" *.png

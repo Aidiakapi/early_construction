@@ -85,6 +85,30 @@ if data.raw.technology["deadlock-bronze-age"] ~= nil then
     }
 end
 
+local base_robot = data.raw['construction-robot']['construction-robot']
+local function robot_clone_and_modify(value)
+    local t = type(value)
+    if t == 'table' then
+        local new_value = {}
+        for k, v in pairs(value) do
+            new_value[robot_clone_and_modify(k)] = robot_clone_and_modify(v)
+        end
+        return new_value
+    elseif t == 'string' then
+        if value:find('__base__/graphics/entity/construction-robot/', 1, true) == 1
+            and value:find('/', 45, true) == nil then
+            return '__early_construction__/graphics/early-construction-robot/' .. value:sub(45)
+        else
+            return value
+        end
+    else
+        return value
+    end
+end
+local function robot_property(name)
+    return robot_clone_and_modify(base_robot[name])
+end
+
 data:extend(
     {
         -- Equipment
@@ -234,7 +258,7 @@ data:extend(
             type = "item",
             name = "early-construction-robot",
             icon = "__early_construction__/graphics/early-construction-robot.png",
-            icon_size = 32,
+            icon_size = 64, icon_mipmaps = 4,
             flags = {},
             subgroup = "logistic-network",
             order = "a[robot]-b[early-construction-robot]",
@@ -245,236 +269,40 @@ data:extend(
             type = "construction-robot",
             name = "early-construction-robot",
             icon = "__early_construction__/graphics/early-construction-robot.png",
-            icon_size = 32,
+            icon_size = 64, icon_mipmaps = 4,
             flags = {"placeable-player", "player-creation", "placeable-off-grid", "not-on-map"},
             minable = {hardness = 0.1, mining_time = 0.1, result = "early-construction-robot"},
             resistances = {{type = "fire", percent = 85}},
-            max_health = 100,
+            max_health = 50,
             collision_box = {{0, 0}, {0, 0}},
             selection_box = {{-0.5, -1.5}, {0.5, -0.5}},
+            hit_visualization_box = {{-0.1, -1.1}, {0.1, -1.0}},
+            damaged_trigger_effect = robot_property('damaged_trigger_effect'),
             max_payload_size = 5,
             speed = 0.06,
-            transfer_distance = 0.5,
             max_energy = "1MJ",
             energy_per_tick = "0kJ",
             speed_multiplier_when_out_of_energy = 1,
             energy_per_move = "0kJ",
             min_to_charge = 0.1,
             max_to_charge = 0.2,
-            working_light = {intensity = 0.8, size = 3, color = {r = 0.8, g = 0.8, b = 0.8}},
+            working_light = {intensity = 0.8, size = 3, color = {r = 0.85, g = 0.75, b = 0.75}},
             dying_explosion = "explosion",
-            idle = {
-                filename = "__early_construction__/graphics/early-construction-robot/construction-robot.png",
-                priority = "high",
-                line_length = 16,
-                width = 32,
-                height = 36,
-                frame_count = 1,
-                shift = {0, -0.15625},
-                direction_count = 16,
-                hr_version = {
-                    filename = "__early_construction__/graphics/early-construction-robot/hr-construction-robot.png",
-                    priority = "high",
-                    line_length = 16,
-                    width = 66,
-                    height = 76,
-                    frame_count = 1,
-                    shift = util.by_pixel(0, -4.5),
-                    direction_count = 16,
-                    scale = 0.5
-                }
-            },
-            in_motion = {
-                filename = "__early_construction__/graphics/early-construction-robot/construction-robot.png",
-                priority = "high",
-                line_length = 16,
-                width = 32,
-                height = 36,
-                frame_count = 1,
-                shift = {0, -0.15625},
-                direction_count = 16,
-                y = 36,
-                hr_version = {
-                    filename = "__early_construction__/graphics/early-construction-robot/hr-construction-robot.png",
-                    priority = "high",
-                    line_length = 16,
-                    width = 66,
-                    height = 76,
-                    frame_count = 1,
-                    shift = util.by_pixel(0, -4.5),
-                    direction_count = 16,
-                    y = 76,
-                    scale = 0.5
-                }
-            },
-            shadow_idle = {
-                filename = "__early_construction__/graphics/early-construction-robot/construction-robot-shadow.png",
-                priority = "high",
-                line_length = 16,
-                width = 50,
-                height = 24,
-                frame_count = 1,
-                shift = {1.09375, 0.59375},
-                direction_count = 16,
-                hr_version = {
-                    filename = "__early_construction__/graphics/early-construction-robot/hr-construction-robot-shadow.png",
-                    priority = "high",
-                    line_length = 16,
-                    width = 104,
-                    height = 49,
-                    frame_count = 1,
-                    shift = util.by_pixel(33.5, 18.75),
-                    direction_count = 16,
-                    scale = 0.5
-                }
-            },
-            shadow_in_motion = {
-                filename = "__early_construction__/graphics/early-construction-robot/construction-robot-shadow.png",
-                priority = "high",
-                line_length = 16,
-                width = 50,
-                height = 24,
-                frame_count = 1,
-                shift = {1.09375, 0.59375},
-                direction_count = 16,
-                hr_version = {
-                    filename = "__early_construction__/graphics/early-construction-robot/hr-construction-robot-shadow.png",
-                    priority = "high",
-                    line_length = 16,
-                    width = 104,
-                    height = 49,
-                    frame_count = 1,
-                    shift = util.by_pixel(33.5, 18.75),
-                    direction_count = 16,
-                    scale = 0.5
-                }
-            },
-            working = {
-                filename = "__early_construction__/graphics/early-construction-robot/construction-robot-working.png",
-                priority = "high",
-                line_length = 2,
-                width = 28,
-                height = 36,
-                frame_count = 2,
-                shift = {0, -0.15625},
-                direction_count = 16,
-                animation_speed = 0.3,
-                hr_version = {
-                    filename = "__early_construction__/graphics/early-construction-robot/hr-construction-robot-working.png",
-                    priority = "high",
-                    line_length = 2,
-                    width = 57,
-                    height = 74,
-                    frame_count = 2,
-                    shift = util.by_pixel(-0.25, -5),
-                    direction_count = 16,
-                    animation_speed = 0.3,
-                    scale = 0.5
-                }
-            },
-            shadow_working = {
-                stripes = util.multiplystripes(
-                    2,
-                    {
-                        {
-                            filename = "__early_construction__/graphics/early-construction-robot/construction-robot-shadow.png",
-                            width_in_frames = 16,
-                            height_in_frames = 1
-                        }
-                    }
-                ),
-                priority = "high",
-                width = 50,
-                height = 24,
-                frame_count = 2,
-                shift = {1.09375, 0.59375},
-                direction_count = 16
-            },
-            smoke = {
-                filename = "__base__/graphics/entity/smoke-construction/smoke-01.png",
-                width = 39,
-                height = 32,
-                frame_count = 19,
-                line_length = 19,
-                shift = {0.078125, -0.15625},
-                animation_speed = 0.3
-            },
-            sparks = {
-                {
-                    filename = "__base__/graphics/entity/sparks/sparks-01.png",
-                    width = 39,
-                    height = 34,
-                    frame_count = 19,
-                    line_length = 19,
-                    shift = {-0.109375, 0.3125},
-                    tint = {r = 1.0, g = 0.9, b = 0.0, a = 1.0},
-                    animation_speed = 0.3
-                },
-                {
-                    filename = "__base__/graphics/entity/sparks/sparks-02.png",
-                    width = 36,
-                    height = 32,
-                    frame_count = 19,
-                    line_length = 19,
-                    shift = {0.03125, 0.125},
-                    tint = {r = 1.0, g = 0.9, b = 0.0, a = 1.0},
-                    animation_speed = 0.3
-                },
-                {
-                    filename = "__base__/graphics/entity/sparks/sparks-03.png",
-                    width = 42,
-                    height = 29,
-                    frame_count = 19,
-                    line_length = 19,
-                    shift = {-0.0625, 0.203125},
-                    tint = {r = 1.0, g = 0.9, b = 0.0, a = 1.0},
-                    animation_speed = 0.3
-                },
-                {
-                    filename = "__base__/graphics/entity/sparks/sparks-04.png",
-                    width = 40,
-                    height = 35,
-                    frame_count = 19,
-                    line_length = 19,
-                    shift = {-0.0625, 0.234375},
-                    tint = {r = 1.0, g = 0.9, b = 0.0, a = 1.0},
-                    animation_speed = 0.3
-                },
-                {
-                    filename = "__base__/graphics/entity/sparks/sparks-05.png",
-                    width = 39,
-                    height = 29,
-                    frame_count = 19,
-                    line_length = 19,
-                    shift = {-0.109375, 0.171875},
-                    tint = {r = 1.0, g = 0.9, b = 0.0, a = 1.0},
-                    animation_speed = 0.3
-                },
-                {
-                    filename = "__base__/graphics/entity/sparks/sparks-06.png",
-                    width = 44,
-                    height = 36,
-                    frame_count = 19,
-                    line_length = 19,
-                    shift = {0.03125, 0.3125},
-                    tint = {r = 1.0, g = 0.9, b = 0.0, a = 1.0},
-                    animation_speed = 0.3
-                }
-            },
-            working_sound = {
-                sound = {
-                    {filename = "__base__/sound/flying-robot-1.ogg", volume = 0.6},
-                    {filename = "__base__/sound/flying-robot-2.ogg", volume = 0.6},
-                    {filename = "__base__/sound/flying-robot-3.ogg", volume = 0.6},
-                    {filename = "__base__/sound/flying-robot-4.ogg", volume = 0.6},
-                    {filename = "__base__/sound/flying-robot-5.ogg", volume = 0.6}
-                },
-                max_sounds_per_type = 3,
-                audible_distance_modifier = 0.5,
-                probability = 1 / (3 * 60) -- average pause between the sound is 3 seconds
-            },
+            sparks = robot_property('sparks'),
+            working_sound = robot_property('working_sound'),
             cargo_centered = {0.0, 0.2},
-            construction_vector = {0.30, 0.22}
+            construction_vector = {0.30, 0.22},
+            water_reflection = robot_property('water_reflection'),
+            idle = robot_property('idle'),
+            idle_with_cargo = robot_property('idle_with_cargo'),
+            in_motion = robot_property('in_motion'),
+            in_motion_with_cargo = robot_property('in_motion_with_cargo'),
+            shadow_idle = robot_property('shadow_idle'),
+            shadow_idle_with_cargo = robot_property('shadow_idle_with_cargo'),
+            shadow_in_motion = robot_property('shadow_in_motion'),
+            shadow_in_motion_with_cargo = robot_property('shadow_in_motion_with_cargo'),
+            working = robot_property('working'),
+            shadow_working = robot_property('shadow_working'),
         },
         -- Recipes
         {
