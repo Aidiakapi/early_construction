@@ -2,7 +2,7 @@ All code is licensed under:
 
 ISC License
 
-Copyright (c) 2018, Aidiakapi
+Copyright (c) 2018-2020, Aidiakapi
 
 Permission to use, copy, modify, and/or distribute this software for any
 purpose with or without fee is hereby granted, provided that the above
