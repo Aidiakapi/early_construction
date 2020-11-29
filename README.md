@@ -2,7 +2,9 @@
 
 ![Screenshot](https://raw.githubusercontent.com/Aidiakapi/early_construction/master/screenshots/title.png)
 
-Adds single use early game construction robots to greatly improve the quality of life of base building. Uses the standard Factorio portable roboport mechanics. Inspired by [Nanobots][2].
+Adds single use early game construction robots to greatly improve the quality of
+life of base building. Uses the standard Factorio portable roboport mechanics.
+Inspired by [Nanobots][2].
 
 # Usage
 
@@ -15,7 +17,8 @@ Adds single use early game construction robots to greatly improve the quality of
 
 # Issues?
 
-If you run into any trouble, preferably submit an issue on GitHub, or otherwise on the mod portal.
+If you run into any trouble, preferably submit an issue on GitHub, or otherwise
+on the mod portal.
 
-[1]: https://mods.factorio.com/mod/early_construction
-[2]: https://mods.factorio.com/mod/Nanobots
+[1]: https://mods.factorio.com/mod/early_construction [2]:
+https://mods.factorio.com/mod/Nanobots
