@@ -20,5 +20,5 @@ Inspired by [Nanobots][2].
 If you run into any trouble, preferably submit an issue on GitHub, or otherwise
 on the mod portal.
 
-[1]: https://mods.factorio.com/mod/early_construction [2]:
-https://mods.factorio.com/mod/Nanobots
+[1]: https://mods.factorio.com/mod/early_construction
+[2]: https://mods.factorio.com/mod/Nanobots
