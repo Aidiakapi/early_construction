@@ -215,7 +215,7 @@ data:extend(
             },
             subgroup = "armor",
             equipment_grid = "small-early-construction-equipment-grid",
-            order = "a[light-armozr][early-construction]",
+            order = "a[light-armor][early-construction]",
             stack_size = 1,
             infinite = true
         },
@@ -249,7 +249,7 @@ data:extend(
             },
             subgroup = "armor",
             equipment_grid = "medium-early-construction-equipment-grid",
-            order = "b[heavy-armozr][early-construction]",
+            order = "b[heavy-armor][early-construction]",
             stack_size = 1,
             infinite = true
         },
