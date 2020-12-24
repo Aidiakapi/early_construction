@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.1
+Date: 24. 12. 2020
+  Features:
+    - Add base game's armor animations to the modded armors as well, thanks to a contribution by millerlarson.
+---------------------------------------------------------------------------------------------------
 Version: 0.9.0
 Date: 29. 11. 2020
   Changes:

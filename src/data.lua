@@ -110,18 +110,18 @@ local function robot_property(name)
 end
 
 -- Apply armor type to character animation, borrowed from Simply Power Armor MK3
-for _, animation in ipairs(data.raw["character"]["character"]["animations"]) do
+-- Contributed by millerlarson
+for _, animation in ipairs(data.raw['character']['character']['animations']) do
     if animation.armors then
-      for _, armor in ipairs(animation.armors) do
-        if armor == "light-armor" then
-          animation.armors[#animation.armors + 1] = "early-construction-light-armor"
-        elseif armor == "heavy-armor" then
-          animation.armors[#animation.armors + 1] = "early-construction-heavy-armor"
-          break
+        for _, armor in ipairs(animation.armors) do
+            if armor == 'light-armor' then
+                animation.armors[#animation.armors + 1] = 'early-construction-light-armor'
+            elseif armor == 'heavy-armor' then
+                animation.armors[#animation.armors + 1] = 'early-construction-heavy-armor'
+            end
         end
-      end
     end
-  end
+end
 
 data:extend(
     {
