@@ -1,4 +1,9 @@
 ---------------------------------------------------------------------------------------------------
+Version: 0.9.3
+Date: 12. 03. 2022
+  Bugfixes:
+    - Update Russian translation.
+---------------------------------------------------------------------------------------------------
 Version: 0.9.2
 Date: 28. 02. 2022
   Features:
@@ -15,12 +20,12 @@ Date: 29. 11. 2020
     - Update to Factorio 1.1.
 ---------------------------------------------------------------------------------------------------
 Version: 0.8.1
-Date: 23. 04. 2020
+Date: 23. 04. 2020n
   Changes:
     - Re-modify graphics from base game, resulting in the same shadows as the base game, as well as updated visual effects.
   Bugfixes:
     - Fixed minor issue with the robot shadow. Thanks millerlarson for reporting!
----------------------------------------------------------------------------------------------------
+---------------------------------------------------------------------------------------------------n
 Version: 0.8.0
 Date: 19. 01. 2020
   Changes:
