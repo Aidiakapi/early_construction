@@ -350,7 +350,7 @@ data:extend(
             energy_required = 3,
             ingredients = robot_ingredients,
             result = "early-construction-robot",
-            result_count = 6
+            result_count = settings.startup["early-construction-robot-by-craft"].value
         },
         -- Technologies
         {
