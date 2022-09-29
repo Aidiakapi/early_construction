@@ -33,7 +33,7 @@ on_built_entity = function (event)
     local player = game.players[event.player_index]
 
     entity.destroy()
-    player.print('Early construction robots cannot be deployed manually, use an early construction equipment in the armor instead.', {r=1,g=0,b=0,a=1})
+    player.print('Early construction robots cannot be deployed manually, use an early construction equipment in the basic schall suit instead.', {r=1,g=0,b=0,a=1})
     player.insert({ name = 'early-construction-robot', count = 1 })
 end
 
@@ -187,7 +187,7 @@ end
 
 on_configuration_changed_handle_startup_setting_changes = function ()
     for _, force in pairs(game.forces) do
-        if force.technologies['early-construction-light-armor'].researched then
+        if force.technologies['early-construction'].researched then
             log(('[early_construction] resetting technology effects for force %q'):format(force.name))
             force.reset_technology_effects()
         end

@@ -22,18 +22,6 @@ if settings.startup["early-construction-enable-entity-ghosts-when-destroyed"].va
     } }
 end
 
-local light_armor_ingredients = {
-    {"light-armor", 1},
-    {"iron-plate", 10},
-    {"iron-gear-wheel", 5},
-    {"electronic-circuit", 40}
-}
-local heavy_armor_ingredients = {
-    {"early-construction-light-armor", 1},
-    {"heavy-armor", 1},
-    {"electronic-circuit", 200},
-    {"steel-plate", 20}
-}
 local equipment_ingredients = {
     {"electronic-circuit", 10}
 }
@@ -55,7 +43,6 @@ end
     Bob's Electronics compatibility patch
 ]]
 if data.raw.item["basic-circuit-board"] ~= nil then
-    patch_strings("electronic-circuit", "basic-circuit-board", light_armor_ingredients)
     patch_strings("electronic-circuit", "basic-circuit-board", equipment_ingredients)
 end
 
@@ -63,18 +50,6 @@ end
     Industrial Revolution compatibility patch
 ]]
 if data.raw.technology["deadlock-bronze-age"] ~= nil then
-    light_armor_ingredients = {
-        {"light-armor", 1},
-        {"copper-plate", 10},
-        {"tin-gear-wheel", 5},
-        {"copper-motor", 10}
-    }
-    heavy_armor_ingredients = {
-        {"early-construction-light-armor", 1},
-        {"heavy-armor", 1},
-        {"copper-motor", 50},
-        {"bronze-chassis-small", 1}
-    }
     equipment_ingredients = {
         {"copper-motor", 5}
     }
@@ -109,27 +84,9 @@ local function robot_property(name)
     return robot_clone_and_modify(base_robot[name])
 end
 
--- Apply armor type to character animation, borrowed from Simply Power Armor MK3
--- Contributed by millerlarson
-for _, animation in ipairs(data.raw['character']['character']['animations']) do
-    if animation.armors then
-        for _, armor in ipairs(animation.armors) do
-            if armor == 'light-armor' then
-                animation.armors[#animation.armors + 1] = 'early-construction-light-armor'
-            elseif armor == 'heavy-armor' then
-                animation.armors[#animation.armors + 1] = 'early-construction-heavy-armor'
-            end
-        end
-    end
-end
-
 data:extend(
     {
         -- Equipment
-        {
-            type = "equipment-category",
-            name = "early-construction-armor"
-        },
         {
             type = "item",
             name = "early-construction-equipment",
@@ -152,8 +109,8 @@ data:extend(
                 priority = "medium"
             },
             shape = {
-                width = 1,
-                height = 1,
+                width = 2,
+                height = 2,
                 type = "full"
             },
             energy_source = {
@@ -182,90 +139,7 @@ data:extend(
             charging_station_count = 0,
             charging_distance = 1.6,
             charging_threshold_distance = 5,
-            categories = {"early-construction-armor"}
-        },
-        -- Armor
-        {
-            type = "equipment-grid",
-            name = "small-early-construction-equipment-grid",
-            width = 1,
-            height = 1,
-            equipment_categories = {"early-construction-armor"}
-        },
-        {
-            type = "equipment-grid",
-            name = "medium-early-construction-equipment-grid",
-            width = 2,
-            height = 1,
-            equipment_categories = {"early-construction-armor"}
-        },
-        {
-            type = "armor",
-            name = "early-construction-light-armor",
-            icon = "__early_construction__/graphics/light-armor.png",
-            icon_size = 32,
-            flags = {},
-            resistances = {
-                {
-                    type = "physical",
-                    decrease = 3,
-                    percent = 20
-                },
-                {
-                    type = "acid",
-                    decrease = 0,
-                    percent = 20
-                },
-                {
-                    type = "explosion",
-                    decrease = 2,
-                    percent = 20
-                },
-                {
-                    type = "fire",
-                    decrease = 0,
-                    percent = 10
-                }
-            },
-            subgroup = "armor",
-            equipment_grid = "small-early-construction-equipment-grid",
-            order = "a[light-armor][early-construction]",
-            stack_size = 1,
-            infinite = true
-        },
-        {
-            type = "armor",
-            name = "early-construction-heavy-armor",
-            icon = "__early_construction__/graphics/heavy-armor.png",
-            icon_size = 32,
-            flags = {},
-            resistances = {
-                {
-                    type = "physical",
-                    decrease = 6,
-                    percent = 30
-                },
-                {
-                    type = "explosion",
-                    decrease = 20,
-                    percent = 30
-                },
-                {
-                    type = "acid",
-                    decrease = 0,
-                    percent = 40
-                },
-                {
-                    type = "fire",
-                    decrease = 0,
-                    percent = 30
-                }
-            },
-            subgroup = "armor",
-            equipment_grid = "medium-early-construction-equipment-grid",
-            order = "b[heavy-armor][early-construction]",
-            stack_size = 1,
-            infinite = true
+            categories = {"armor-early"}
         },
         -- Robot
         {
@@ -321,22 +195,6 @@ data:extend(
         -- Recipes
         {
             type = "recipe",
-            name = "early-construction-light-armor",
-            enabled = false,
-            energy_required = 3,
-            ingredients = light_armor_ingredients,
-            result = "early-construction-light-armor"
-        },
-        {
-            type = "recipe",
-            name = "early-construction-heavy-armor",
-            enabled = false,
-            energy_required = 8,
-            ingredients = heavy_armor_ingredients,
-            result = "early-construction-heavy-armor"
-        },
-        {
-            type = "recipe",
             enabled = false,
             name = "early-construction-equipment",
             energy_required = 1,
@@ -355,17 +213,13 @@ data:extend(
         -- Technologies
         {
             type = "technology",
-            name = "early-construction-light-armor",
+            name = "early-construction",
             icon_size = 128,
             icon = "__early_construction__/graphics/technology.png",
             effects = combine_effects({
                 {
                     type = "unlock-recipe",
                     recipe = "early-construction-robot"
-                },
-                {
-                    type = "unlock-recipe",
-                    recipe = "early-construction-light-armor"
                 },
                 {
                     type = "unlock-recipe",
@@ -379,27 +233,5 @@ data:extend(
             },
             order = "a-c-a"
         },
-        {
-            type = "technology",
-            name = "early-construction-heavy-armor",
-            icon_size = 128,
-            icon = "__early_construction__/graphics/technology.png",
-            effects = {
-                {
-                    type = "unlock-recipe",
-                    recipe = "early-construction-heavy-armor"
-                }
-            },
-            prerequisites = {"heavy-armor", "early-construction-light-armor", "logistic-science-pack"},
-            unit = {
-                count = 200,
-                ingredients = {
-                    {"automation-science-pack", 1},
-                    {"logistic-science-pack", 1}
-                },
-                time = 30
-            },
-            order = "a-c-b"
-        }
     }
 )

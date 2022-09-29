@@ -1,4 +1,13 @@
 ---------------------------------------------------------------------------------------------------
+Version:
+Date:
+  Changes:
+    - Early Construction Light armor technology by just Early Contruction Light technology.
+    - Size of construction-robot is now 2*2 to balanced schall suit size.
+  Removes:
+    - light and heavy armor replaced by basic ingenior suit of Schall suit mod.
+    - heavy armor technology.
+---------------------------------------------------------------------------------------------------
 Version: 0.9.3
 Date: 12. 03. 2022
   Bugfixes:

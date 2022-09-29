@@ -1,6 +1,6 @@
 {
     "name": "early_construction",
-    "version": "0.9.3",
+    "version": "0.10.0",
     "title": "Early Construction",
     "author": "Aidiakapi",
     "contact": "aidiakapi@gmail.com",
@@ -9,6 +9,7 @@
     "factorio_version": "1.1",
     "dependencies": [
         "base >= 1.1.0",
+        "? SchallSuit >= 1.0.0",
         "?bobelectronics >= 0.18",
         "?IndustrialRevolution >= 1.0"
     ]
