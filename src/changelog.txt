@@ -3,6 +3,8 @@ Version:
 Date:
   Features:
     - Add setting to customize robot by craft recipe.
+  Changes:
+    - Compatibility dependencies are now hidden
 ---------------------------------------------------------------------------------------------------
 Version: 0.9.3
 Date: 12. 03. 2022
