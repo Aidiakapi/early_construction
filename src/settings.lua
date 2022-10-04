@@ -7,11 +7,12 @@ data:extend({
         default_value = true
     },
     {
-      type = "int-setting",
-      name = "early-construction-robot-by-craft",
-      setting_type = "startup",
+      type = 'int-setting',
+      name = 'early-construction-robots-per-craft',
+      setting_type = 'startup',
+      order = 'b',
       default_value = 6,
       minimum_value = 1,
-      order = "a"
+      maximum_value = 50
     },
 })
