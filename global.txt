@@ -1,14 +1,33 @@
 Document describes the layout of the global table.
 
+v1.0:
+
+version == 2
+
+global :: {
+    version :: "Global table version, for easier migration code" int
+    is_ticking :: bool
+    tracked_robots[unit_number :: int] :: "Dictionary of all the robots that have placed or destroyed an entity, and should therefore be consumed" {
+        robot :: LuaEntity (type == 'construction-robot')
+        no_destruction_before_tick :: "prevents destruction of robot in the same tick that a related event fires, for mod compatibility" int
+        cargo_inventory :: LuaInventory
+        repair_inventory :: LuaInventory
+    }
+    per_player[player_index :: int] :: "Meta information per-player" {
+        last_armor_reclaimation_tick :: "Last tick in which we tried to reclaim an invalid armor to the player's inventory" int
+        has_disallowed_equipment :: "Whether the player has personal roboports except from this mod" bool
+    }
+}
+
 v0.6:
 
 version == 1
 
 global :: {
-    version :: "Global table version, for easier migration code" int,
-    is_ticking :: bool,
+    version :: "Global table version, for easier migration code" int
+    is_ticking :: bool
     tracked_robots[unit_number :: int] :: "Dictionary of all the robots that have placed or destroyed an entity, and should therefore be consumed" {
-        robot :: LuaEntity (type == 'construction-robot'),
+        robot :: LuaEntity (type == 'construction-robot')
         no_destruction_before_tick :: "prevents destruction of robot in the same tick that a related event fires, for mod compatibility" int
         cargo_inventory :: LuaInventory
         repair_inventory :: LuaInventory

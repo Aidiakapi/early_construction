@@ -1,9 +1,19 @@
 local -- Forward declare functions
+      reset_individual_global_per_player,
+      on_player_created,
+      on_player_respawned,
+      on_player_removed,
       on_robot_built,
       on_robot_mined,
       on_built_entity,
       on_player_mined_entity,
+      on_player_placed_equipment,
+      on_player_removed_equipment,
+      on_player_armor_inventory_changed,
+      on_player_main_inventory_changed,
+      spill_from_inventory_if_necessary,
       on_tick,
+      has_disallowed_equipment,
       track_robot,
       untrack_robot,
       create_robot_death_effect,
@@ -13,7 +23,26 @@ local -- Forward declare functions
       on_configuration_changed,
       on_configuration_changed_migrate_0_3_to_0_4,
       on_configuration_changed_migrate_0_5_to_0_6,
+      on_configuration_changed_migrate_0_9_to_1_0,
       on_configuration_changed_handle_startup_setting_changes
+
+reset_individual_global_per_player = function (player_index)
+    local player = game.players[player_index]
+    local character = player.character
+    local grid = character and character.grid or nil
+    global.per_player[player_index] = {
+        last_armor_reclaimation_tick = 0,
+        has_disallowed_equipment = grid and has_disallowed_equipment(grid),
+    }
+    spill_from_inventory_if_necessary(player_index)
+end
+on_player_created = function (event)
+    reset_individual_global_per_player(event.player_index)
+end
+on_player_respawned = on_player_created
+on_player_removed = function (event)
+    global.per_player[event.player_index] = nil
+end
 
 on_robot_built = function (event)
     local robot = event.robot
@@ -33,7 +62,7 @@ on_built_entity = function (event)
     local player = game.players[event.player_index]
 
     entity.destroy()
-    player.print('Early construction robots cannot be deployed manually, use an early construction equipment in the armor instead.', {r=1,g=0,b=0,a=1})
+    player.print({'early-construction-errors.placing'}, {r=1,g=0,b=0,a=1})
     player.insert({ name = 'early-construction-robot', count = 1 })
 end
 
@@ -44,6 +73,140 @@ on_player_mined_entity = function (event)
         create_robot_death_effect(event.entity)
         untrack_robot(event.entity.unit_number)
     end
+end
+
+-- Prevents using early construction robots with regular personal roboports
+has_disallowed_equipment = function (grid)
+    for _, equipment in pairs(grid.equipment) do
+        if equipment.type == 'roboport-equipment' and equipment.name ~= 'early-construction-equipment' then
+            return true
+        end
+    end
+    return false
+end
+
+local function on_player_modified_equipment_common(event)
+    local grid = event.grid
+    local player = game.players[event.player_index]
+
+    local character = player.character
+    local is_equipped = character ~= nil and character.grid == grid
+    if not is_equipped then return end
+
+    return player, character, grid
+end
+
+on_player_placed_equipment = function (event)
+    local equipment = event.equipment
+    if equipment.type ~= 'roboport-equipment' then return end
+    if equipment.name == 'early-construction-equipment' then return end
+
+    local player, character, grid = on_player_modified_equipment_common(event)
+    if player == nil then return end
+
+    local inventory = player.get_main_inventory()
+    local robot_count = inventory.get_item_count('early-construction-robot')
+
+    local per_player = global.per_player[player.index]
+    if robot_count == 0 then
+        per_player.has_disallowed_equipment = true
+        return
+    end
+
+    player.print({'early-construction-errors.incompatible-equipment'}, {r=1,g=0,b=0,a=1})
+    local item_stack = grid.take({ equipment = equipment, by_player = player })
+    inventory.insert(item_stack)
+end
+
+on_player_removed_equipment = function (event)
+    local player, character, grid = on_player_modified_equipment_common(event)
+    if player == nil then return end
+
+    local per_player = global.per_player[player.index]
+    per_player.has_disallowed_equipment = has_disallowed_equipment(grid)
+end
+
+on_player_armor_inventory_changed = function (event)
+    local player = game.players[event.player_index]
+
+    local character = player.character
+    if character == nil then return end
+
+    local armor_slot = character.get_inventory(defines.inventory.character_armor)[1]
+    local grid = armor_slot.valid and armor_slot.valid_for_read and armor_slot.grid or nil
+
+    local per_player = global.per_player[player.index]
+    if grid == nil or not has_disallowed_equipment(grid) then
+        per_player.has_disallowed_equipment = false
+        return
+    end
+
+    local inventory = player.get_main_inventory()
+    local robot_count = inventory.get_item_count('early-construction-robot')
+    if robot_count == 0 then
+        per_player.has_disallowed_equipment = true
+        return
+    end
+    
+    player.print({'early-construction-errors.incompatible-equipment'}, {r=1,g=0,b=0,a=1})
+
+    -- Put in inventory or drop on ground
+
+    -- Clearing the player's hand location is necessary for properly swapping
+    -- out armors. If you do not have this, then the game will "re-insert" the
+    -- armor in the armor slot, causing an endless loop, and spilling them item
+    -- instead.
+    player.hand_location = nil
+
+    -- Even with the previous line, there are still scenarios where there will
+    -- be an "infinite loop" of the game picking up the item, and inserting it
+    -- into the armor slot. If we already attempted to insert the armor into the
+    -- inventory in the last 125ms, it falls back to spilling the armor into the
+    -- world.
+    local empty_stack = inventory.find_empty_stack(armor_slot.name)
+    local per_player = global.per_player[player.index]
+    if per_player.last_armor_reclaimation_tick + 8 < event.tick and
+        empty_stack ~= nil and
+        empty_stack.set_stack(armor_slot)
+    then
+        per_player.last_armor_reclaimation_tick = event.tick
+        armor_slot.clear()
+        return
+    end
+
+    character.surface.spill_item_stack(
+        character.position, armor_slot,
+        --[[enable_looted]] false, --[[force]] nil, --[[allow_belts]] false)
+    armor_slot.clear()
+end
+
+on_player_main_inventory_changed = function (event)
+    spill_from_inventory_if_necessary(event.player_index)
+end
+
+spill_from_inventory_if_necessary = function (player_index)
+    local per_player = global.per_player[player_index]
+    if not per_player.has_disallowed_equipment then return end
+
+    local player = game.players[player_index]
+    local character = player.character
+    -- In theory, has_disallowed_equipment should always be false when there is
+    -- no character, since a lack of character means a lack of equipment grid.
+    -- In practice, there's probably some scenarios, such as right after a
+    -- player dies, where this could occur, so better safeguard.
+    if character == nil then return end
+
+    local inventory = player.get_main_inventory()
+    local robot_count = inventory.get_item_count('early-construction-robot')
+
+    if robot_count == 0 then return end
+
+    player.print({'early-construction-errors.robots-in-inventory'}, {r=1,g=0,b=0,a=1})
+    local item_stack = { name = 'early-construction-robot', count = robot_count }
+    character.surface.spill_item_stack(
+        character.position, item_stack,
+        --[[enable_looted]] false, --[[force]] nil, --[[allow_belts]] false)
+    inventory.remove(item_stack)
 end
 
 on_tick = function (event)
@@ -121,7 +284,9 @@ on_configuration_changed = function (changes)
     if global.version == nil then
         on_configuration_changed_migrate_0_3_to_0_4()
         on_configuration_changed_migrate_0_5_to_0_6()
-        game.print('[Early Construction] Migrated to version 0.7.')
+    end
+    if global.version == 1 then
+        on_configuration_changed_migrate_0_9_to_1_0()
     end
 
     if changes.mod_startup_settings_changed or changes.mod_changes['early_construction'] then
@@ -185,6 +350,14 @@ on_configuration_changed_migrate_0_5_to_0_6 = function ()
     update_tick_handler()
 end
 
+on_configuration_changed_migrate_0_9_to_1_0 = function ()
+    global.version = 2
+    global.per_player = {}
+    for _, player in pairs(game.players) do
+        reset_individual_global_per_player(player.index)
+    end
+end
+
 on_configuration_changed_handle_startup_setting_changes = function ()
     for _, force in pairs(game.forces) do
         if force.technologies['early-construction-light-armor'].researched then
@@ -194,12 +367,24 @@ on_configuration_changed_handle_startup_setting_changes = function ()
     end
 end
 
+script.on_event(defines.events.on_player_created, on_player_created)
+script.on_event(defines.events.on_player_respawned, on_player_respawned)
+script.on_event(defines.events.on_player_removed, on_player_removed)
 script.on_event(defines.events.on_robot_built_entity, on_robot_built)
 script.on_event(defines.events.on_robot_built_tile, on_robot_built)
 script.on_event(defines.events.on_robot_mined, on_robot_mined)
 script.on_event(defines.events.on_built_entity, on_built_entity)
 script.on_event(defines.events.on_player_mined_entity, on_player_mined_entity)
+script.on_event(defines.events.on_player_placed_equipment, on_player_placed_equipment)
+script.on_event(defines.events.on_player_removed_equipment, on_player_removed_equipment)
+script.on_event(defines.events.on_player_armor_inventory_changed, on_player_armor_inventory_changed)
+script.on_event(defines.events.on_player_main_inventory_changed, on_player_main_inventory_changed)
 
 script.on_init(on_init)
 script.on_load(on_load)
 script.on_configuration_changed(on_configuration_changed)
+
+-- commands.add_command('early_construction_dump_global', nil, function (command)
+--     game.print('Global table for early_construction:')
+--     game.print(serpent.block(global))
+-- end)
