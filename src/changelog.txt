@@ -1,6 +1,6 @@
 ---------------------------------------------------------------------------------------------------
-Version:
-Date:
+Version: 0.9.4
+Date: 29. 09. 2022
   Features:
     - Add setting to customize robot by craft recipe.
 ---------------------------------------------------------------------------------------------------
@@ -30,7 +30,7 @@ Date: 23. 04. 2020n
     - Re-modify graphics from base game, resulting in the same shadows as the base game, as well as updated visual effects.
   Bugfixes:
     - Fixed minor issue with the robot shadow. Thanks millerlarson for reporting!
----------------------------------------------------------------------------------------------------n
+---------------------------------------------------------------------------------------------------
 Version: 0.8.0
 Date: 19. 01. 2020
   Changes:
@@ -103,4 +103,3 @@ Version: 0.1.0
 Date: 19. 11. 2018
   Features:
     - Add early game robots.
-    
