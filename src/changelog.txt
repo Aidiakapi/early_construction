@@ -2,7 +2,7 @@
 Version: 0.9.4
 Date: 29. 09. 2022
   Features:
-    - Add setting to customize robot by craft recipe.
+    - Add setting to customize the amount of robots you gain for crafting the recipe once.
 ---------------------------------------------------------------------------------------------------
 Version: 0.9.3
 Date: 12. 03. 2022
