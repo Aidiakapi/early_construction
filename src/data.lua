@@ -17,8 +17,8 @@ end
 local ghosts_when_destroyed_effects
 if settings.startup["early-construction-enable-entity-ghosts-when-destroyed"].value then
     ghosts_when_destroyed_effects = { {
-        type = "ghost-time-to-live",
-        modifier = 60 * 60 * 60 * 24 * 7
+        type = "create-ghost-on-entity-death",
+        modifier = true
     } }
 end
 
@@ -85,6 +85,22 @@ if data.raw.technology["deadlock-bronze-age"] ~= nil then
     }
 end
 
+local function upgrade_shorthand_ingredients_to_full(ingredients)
+    for k, v in pairs(ingredients) do
+        if v.type == nil then
+            ingredients[k] = {
+                type = "item",
+                name = v[1],
+                amount = v[2],
+            }
+        end
+    end
+end
+upgrade_shorthand_ingredients_to_full(light_armor_ingredients)
+upgrade_shorthand_ingredients_to_full(heavy_armor_ingredients)
+upgrade_shorthand_ingredients_to_full(equipment_ingredients)
+upgrade_shorthand_ingredients_to_full(robot_ingredients)
+
 local base_robot = data.raw['construction-robot']['construction-robot']
 local function robot_clone_and_modify(value)
     local t = type(value)
@@ -135,7 +151,7 @@ data:extend(
             name = "early-construction-equipment",
             icon = "__early_construction__/graphics/early-construction-equipment.png",
             icon_size = 32,
-            placed_as_equipment_result = "early-construction-equipment",
+            place_as_equipment_result = "early-construction-equipment",
             flags = {},
             subgroup = "equipment",
             order = "e[robotics]-a[early-construction-equipment]",
@@ -152,8 +168,8 @@ data:extend(
                 priority = "medium"
             },
             shape = {
-                width = 1,
-                height = 1,
+                width = 6,
+                height = 6,
                 type = "full"
             },
             energy_source = {
@@ -166,20 +182,24 @@ data:extend(
             robot_limit = 15,
             construction_radius = 12,
             spawn_and_station_height = 0.4,
+            spawn_and_station_shadow_height_offset = 0.5,
             charge_approach_distance = 2.6,
+            robots_shrink_when_entering_and_exiting = true,
             recharging_animation = {
                 filename = "__base__/graphics/entity/roboport/roboport-recharging.png",
+                draw_as_glow = true,
                 priority = "high",
                 width = 37,
                 height = 35,
                 frame_count = 16,
-                scale = 0.75,
+                scale = 1.5,
                 animation_speed = 0.5
             },
-            recharging_light = {intensity = 0.4, size = 5},
+            recharging_light = {intensity = 0.2, size = 3, color = {r = 0.5, g = 0.5, b = 1.0}},
             stationing_offset = {0, -0.6},
             charging_station_shift = {0, 0.5},
-            charging_station_count = 0,
+            charging_station_count = 2,
+            charging_station_count_affected_by_quality = false,
             charging_distance = 1.6,
             charging_threshold_distance = 5,
             categories = {"early-construction-armor"}
@@ -188,15 +208,15 @@ data:extend(
         {
             type = "equipment-grid",
             name = "small-early-construction-equipment-grid",
-            width = 1,
-            height = 1,
+            width = 6,
+            height = 6,
             equipment_categories = {"early-construction-armor"}
         },
         {
             type = "equipment-grid",
             name = "medium-early-construction-equipment-grid",
-            width = 2,
-            height = 1,
+            width = 12,
+            height = 6,
             equipment_categories = {"early-construction-armor"}
         },
         {
@@ -325,7 +345,11 @@ data:extend(
             enabled = false,
             energy_required = 3,
             ingredients = light_armor_ingredients,
-            result = "early-construction-light-armor"
+            results = { {
+                type = "item",
+                name = "early-construction-light-armor",
+                amount = 1,
+            } },
         },
         {
             type = "recipe",
@@ -333,15 +357,23 @@ data:extend(
             enabled = false,
             energy_required = 8,
             ingredients = heavy_armor_ingredients,
-            result = "early-construction-heavy-armor"
+            results = { {
+                type = "item",
+                name = "early-construction-heavy-armor",
+                amount = 1,
+            } },
         },
         {
             type = "recipe",
-            enabled = false,
             name = "early-construction-equipment",
+            enabled = false,
             energy_required = 1,
             ingredients = equipment_ingredients,
-            result = "early-construction-equipment"
+            results = { {
+                type = "item",
+                name = "early-construction-equipment",
+                amount = 1,
+            } },
         },
         {
             type = "recipe",
@@ -349,8 +381,11 @@ data:extend(
             enabled = false,
             energy_required = 3,
             ingredients = robot_ingredients,
-            result = "early-construction-robot",
-            result_count = settings.startup["early-construction-robots-per-craft"].value
+            results = { {
+                type = "item",
+                name = "early-construction-robot",
+                amount = settings.startup["early-construction-robots-per-craft"].value,
+            } },
         },
         -- Technologies
         {
@@ -358,6 +393,7 @@ data:extend(
             name = "early-construction-light-armor",
             icon_size = 128,
             icon = "__early_construction__/graphics/technology.png",
+            prerequisites = {"automation-science-pack"},
             effects = combine_effects({
                 {
                     type = "unlock-recipe",

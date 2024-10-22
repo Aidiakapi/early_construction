@@ -39,7 +39,7 @@ end
 
 on_player_mined_entity = function (event)
     if not event.entity or not event.entity.valid or event.entity.name ~= 'early-construction-robot' then return end
-    if global.tracked_robots[event.entity.unit_number] ~= nil then
+    if storage.tracked_robots[event.entity.unit_number] ~= nil then
         event.buffer.remove({ name = 'early-construction-robot', count = 1 })
         create_robot_death_effect(event.entity)
         untrack_robot(event.entity.unit_number)
@@ -47,7 +47,7 @@ on_player_mined_entity = function (event)
 end
 
 on_tick = function (event)
-    for unit_number, entry in pairs(global.tracked_robots) do
+    for unit_number, entry in pairs(storage.tracked_robots) do
         if not entry.robot.valid then
             untrack_robot(unit_number)
         elseif event.tick >= entry.no_destruction_before_tick then
@@ -68,11 +68,11 @@ on_tick = function (event)
 end
 
 track_robot = function (robot, no_destruction_before_tick)
-    if global.tracked_robots[robot.unit_number] then
+    if storage.tracked_robots[robot.unit_number] then
         untrack_robot(robot.unit_number)
     end
 
-    global.tracked_robots[robot.unit_number] = {
+    storage.tracked_robots[robot.unit_number] = {
         robot = robot,
         no_destruction_before_tick = no_destruction_before_tick,
         cargo_inventory = robot.get_inventory(defines.inventory.robot_cargo),
@@ -82,8 +82,8 @@ track_robot = function (robot, no_destruction_before_tick)
 end
 
 untrack_robot = function (unit_number)
-    if global.tracked_robots[unit_number] == nil then return end
-    global.tracked_robots[unit_number] = nil
+    if storage.tracked_robots[unit_number] == nil then return end
+    storage.tracked_robots[unit_number] = nil
     update_tick_handler()
 end
 
@@ -96,29 +96,29 @@ create_robot_death_effect = function (robot)
 end
 
 update_tick_handler = function ()
-    local should_be_ticking = table_size(global.tracked_robots) > 0
-    global.is_ticking = should_be_ticking
+    local should_be_ticking = table_size(storage.tracked_robots) > 0
+    storage.is_ticking = should_be_ticking
     script.on_event(defines.events.on_tick, should_be_ticking and on_tick or nil)
 end
 
 on_init = function ()
-    global.tracked_robots = {}
-    global.tracked_robots_count = 0
-    global.robots_pending_destruction = {}
-    global.forces = {}
+    storage.tracked_robots = {}
+    storage.tracked_robots_count = 0
+    storage.robots_pending_destruction = {}
+    storage.forces = {}
     for _, force in pairs(game.forces) do
-        global.forces[force.name] = {}
+        storage.forces[force.name] = {}
     end
 end
 
 on_load = function ()
-    if global.is_ticking then
+    if storage.is_ticking then
         script.on_event(defines.events.on_tick, on_tick)
     end
 end
 
 on_configuration_changed = function (changes)
-    if global.version == nil then
+    if storage.version == nil then
         on_configuration_changed_migrate_0_3_to_0_4()
         on_configuration_changed_migrate_0_5_to_0_6()
         game.print('[Early Construction] Migrated to version 0.7.')
@@ -130,50 +130,50 @@ on_configuration_changed = function (changes)
 end
 
 on_configuration_changed_migrate_0_3_to_0_4 = function ()
-    -- Renamed global.tracked_robot_count to global.tracked_robots_count
-    if global.tracked_robot_count then
-        global.tracked_robot_count = nil
+    -- Renamed storage.tracked_robot_count to storage.tracked_robots_count
+    if storage.tracked_robot_count then
+        storage.tracked_robot_count = nil
     end
 
     -- Previously, this variable wasn't initialized upon init, and was instead nil-checked
-    -- now it is initialized. This variable can be safely derived from global.tracked_robots.
-    if global.tracked_robots_count == nil then
+    -- now it is initialized. This variable can be safely derived from storage.tracked_robots.
+    if storage.tracked_robots_count == nil then
         local count = 0
-        for _ in pairs(global.tracked_robots) do
+        for _ in pairs(storage.tracked_robots) do
             count = count + 1
         end
-        global.tracked_robots_count = count
+        storage.tracked_robots_count = count
     end
 
-    -- Renamed global.ticking to global.is_ticking
-    -- update_tick_handler invoked later will take care of initializing the global variable,
+    -- Renamed storage.ticking to storage.is_ticking
+    -- update_tick_handler invoked later will take care of initializing the storage variable,
     -- and setting up the event handler if necessary.
-    global.ticking = nil
+    storage.ticking = nil
 
     -- Newly introduced variables
-    if global.robots_pending_destruction == nil then
-        global.robots_pending_destruction = {}
+    if storage.robots_pending_destruction == nil then
+        storage.robots_pending_destruction = {}
     end
 
     update_tick_handler()
 end
 
 on_configuration_changed_migrate_0_5_to_0_6 = function ()
-    local old_tracked_robots = global.tracked_robots
-    for k, _ in pairs(global) do
-        global[k] = nil
+    local old_tracked_robots = storage.tracked_robots
+    for k, _ in pairs(storage) do
+        storage[k] = nil
     end
 
-    global.version = 1
-    global.tracked_robots = {}
+    storage.version = 1
+    storage.tracked_robots = {}
     for _, entry in pairs(old_tracked_robots) do
         local robot = entry.robot
         if (robot and
             robot.valid and
             robot.name == 'early-construction-robot' and
-            global.tracked_robots[robot.unit_number] == nil) then
+            storage.tracked_robots[robot.unit_number] == nil) then
 
-            global.tracked_robots[robot.unit_number] = {
+            storage.tracked_robots[robot.unit_number] = {
                 robot = robot,
                 cargo_inventory = robot.get_inventory(defines.inventory.robot_cargo),
                 repair_inventory = robot.get_inventory(defines.inventory.robot_repair),

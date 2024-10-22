@@ -1,4 +1,10 @@
 ---------------------------------------------------------------------------------------------------
+Version: 1.0.0
+Date: 21. 10. 2024
+  Features:
+    - Upgrade to Factorio 2.0/Space Age!
+    - Unlock various shortcuts when the technology is researched. Thanks to the contribution by azaghal!
+---------------------------------------------------------------------------------------------------
 Version: 0.9.4
 Date: 29. 09. 2022
   Features:
