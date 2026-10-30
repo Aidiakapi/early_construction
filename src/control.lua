@@ -28,7 +28,7 @@ on_robot_mined = function (event)
 end
 
 on_built_entity = function (event)
-    local entity = event.created_entity
+    local entity = event.entity
     if not entity or entity.name ~= 'early-construction-robot' then return end
     local player = game.players[event.player_index]
 
